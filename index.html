@@ -1,33 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consumir APIs</title>
+
+    <title>API REST Productos</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
 
         body{
             font-family: Arial;
-            margin: 40px;
-            background: #f5f5f5;
+            background: #eef2ff;
+            padding: 30px;
         }
 
         h1{
             color: #1e3a8a;
+            text-align: center;
         }
 
         .contenedor{
+
+            max-width: 900px;
+            margin: auto;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+
         }
 
-        .card{
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
+        .formulario{
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input{
+
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+
+        }
+
+        button{
+
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+
+        }
+
+        .btn-agregar{
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-actualizar{
+            background: #f59e0b;
+            color: white;
+        }
+
+        .producto{
+
+            margin-top: 15px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 5px solid #2563eb;
+
+        }
+
+        .acciones{
+            margin-top: 10px;
+        }
+
+        .btn-editar{
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .btn-eliminar{
+            background: #dc2626;
+            color: white;
         }
 
     </style>
@@ -35,79 +96,304 @@
 </head>
 <body>
 
-    <h1>Consumo de APIs</h1>
-
-    <!-- PRODUCTOS -->
-
     <div class="contenedor">
 
-        <h2>Productos</h2>
+        <h1>CRUD API Productos</h1>
+
+        <input type="hidden" id="id">
+
+        <div class="formulario">
+
+            <input type="text" id="nombre" placeholder="Nombre">
+
+            <input type="number" id="precio" placeholder="Precio">
+
+            <input type="number" id="cantidad" placeholder="Cantidad">
+
+            <button class="btn-agregar" onclick="agregarProducto()">
+                Agregar
+            </button>
+
+            <button class="btn-actualizar" onclick="actualizarProducto()">
+                Actualizar
+            </button>
+
+        </div>
 
         <div id="productos"></div>
 
     </div>
 
-    <!-- CLIENTES -->
+<script>
 
-    <div class="contenedor">
+const API = "http://localhost/mi_api/api/productos/productos.php";
 
-        <h2>Clientes</h2>
 
-        <div id="clientes"></div>
+// =====================================
+// CARGAR
+// =====================================
 
-    </div>
+function cargarProductos(){
 
-    <script>
+    fetch(API)
 
-        // API PRODUCTOS
+    .then(response => response.json())
 
-        fetch("http://localhost/mi_api/api/productos/productos.php")
-        .then(response => response.json())
-        .then(data => {
+    .then(data => {
 
-            let contenido = "";
+        let contenido = "";
 
-            data.forEach(producto => {
+        data.forEach(producto => {
 
-                contenido += `
-                    <div class="card">
-                        <h3>${producto.nombre}</h3>
-                        <p>Precio: $${producto.precio}</p>
-                        <p>Cantidad: ${producto.cantidad}</p>
+            contenido += `
+
+                <div class="producto">
+
+                    <h3>${producto.nombre}</h3>
+
+                    <p><b>Precio:</b> $${producto.precio}</p>
+
+                    <p><b>Cantidad:</b> ${producto.cantidad}</p>
+
+                    <div class="acciones">
+
+                        <button class="btn-editar"
+
+                        onclick="editarProducto(
+                            ${producto.id},
+                            '${producto.nombre}',
+                            ${producto.precio},
+                            ${producto.cantidad}
+                        )">
+
+                            Editar
+
+                        </button>
+
+                        <button class="btn-eliminar"
+
+                        onclick="eliminarProducto(${producto.id})">
+
+                            Eliminar
+
+                        </button>
+
                     </div>
-                `;
 
-            });
+                </div>
 
-            document.getElementById("productos").innerHTML = contenido;
+            `;
 
         });
 
-        // API CLIENTES
+        document.getElementById("productos").innerHTML = contenido;
 
-        fetch("http://localhost/mi_api/api/clientes/clientes.php")
-        .then(response => response.json())
-        .then(data => {
+    });
 
-            let contenido = "";
+}
 
-            data.forEach(cliente => {
+cargarProductos();
 
-                contenido += `
-                    <div class="card">
-                        <h3>${cliente.nombre}</h3>
-                        <p>edad: ${cliente.edad}</p>
-                        <p>Teléfono: ${cliente.telefono}</p>
-                    </div>
-                `;
+
+
+// =====================================
+// AGREGAR
+// =====================================
+
+function agregarProducto(){
+
+    const nombre = document.getElementById("nombre").value;
+
+    const precio = document.getElementById("precio").value;
+
+    const cantidad = document.getElementById("cantidad").value;
+
+    fetch(API, {
+
+        method: "POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+
+            nombre,
+            precio,
+            cantidad
+
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.estado == "ok"){
+
+            Swal.fire({
+                icon: "success",
+                title: data.mensaje
+            });
+
+            cargarProductos();
+
+        }else{
+
+            Swal.fire({
+                icon: "error",
+                title: data.mensaje
+            });
+
+        }
+
+    });
+
+}
+
+
+
+// =====================================
+// EDITAR
+// =====================================
+
+function editarProducto(id, nombre, precio, cantidad){
+
+    document.getElementById("id").value = id;
+
+    document.getElementById("nombre").value = nombre;
+
+    document.getElementById("precio").value = precio;
+
+    document.getElementById("cantidad").value = cantidad;
+
+}
+
+
+
+// =====================================
+// ACTUALIZAR
+// =====================================
+
+function actualizarProducto(){
+
+    Swal.fire({
+
+        title: "¿Actualizar producto?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, actualizar"
+
+    })
+
+    .then((result) => {
+
+        if(result.isConfirmed){
+
+            const id = document.getElementById("id").value;
+
+            const nombre = document.getElementById("nombre").value;
+
+            const precio = document.getElementById("precio").value;
+
+            const cantidad = document.getElementById("cantidad").value;
+
+            fetch(API, {
+
+                method: "PUT",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body: JSON.stringify({
+
+                    id,
+                    nombre,
+                    precio,
+                    cantidad
+
+                })
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                Swal.fire({
+                    icon: "success",
+                    title: data.mensaje
+                });
+
+                cargarProductos();
 
             });
 
-            document.getElementById("clientes").innerHTML = contenido;
+        }
 
-        });
+    });
 
-    </script>
+}
+
+
+
+// =====================================
+// ELIMINAR
+// =====================================
+
+function eliminarProducto(id){
+
+    Swal.fire({
+
+        title: "¿Eliminar producto?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "Sí, eliminar"
+
+    })
+
+    .then((result) => {
+
+        if(result.isConfirmed){
+
+            fetch(API, {
+
+                method: "DELETE",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body: JSON.stringify({
+                    id
+                })
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                Swal.fire({
+                    icon: "success",
+                    title: data.mensaje
+                });
+
+                cargarProductos();
+
+            });
+
+        }
+
+    });
+
+}
+
+</script>
 
 </body>
 </html>
