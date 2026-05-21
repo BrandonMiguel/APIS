@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consumir API</title>
+</head>
+<body>
+
+    <h1>Lista de Productos</h1>
+
+    <div id="productos"></div>
+
+    <script>
+
+        fetch("http://localhost/mi_api/productos.php")
+        .then(response => response.json())
+        .then(data => {
+
+            let contenido = "";
+
+            data.forEach(producto => {
+
+                contenido += `
+                    <hr>
+                    <h3>${producto.nombre}</h3>
+                    <p>Precio: $${producto.precio}</p>
+                    <p>Cantidad: ${producto.cantidad}</p>
+                `;
+
+            });
+
+            document.getElementById("productos").innerHTML = contenido;
+
+        });
+
+    </script>
+
+</body>
+</html>
