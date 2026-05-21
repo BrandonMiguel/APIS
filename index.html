@@ -2,17 +2,66 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Consumir API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumir APIs</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+
+        h1{
+            color: #1e3a8a;
+        }
+
+        .contenedor{
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        .card{
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+        }
+
+    </style>
+
 </head>
 <body>
 
-    <h1>Lista de Productos</h1>
+    <h1>Consumo de APIs</h1>
 
-    <div id="productos"></div>
+    <!-- PRODUCTOS -->
+
+    <div class="contenedor">
+
+        <h2>Productos</h2>
+
+        <div id="productos"></div>
+
+    </div>
+
+    <!-- CLIENTES -->
+
+    <div class="contenedor">
+
+        <h2>Clientes</h2>
+
+        <div id="clientes"></div>
+
+    </div>
 
     <script>
 
-        fetch("http://localhost/mi_api/productos.php")
+        // API PRODUCTOS
+
+        fetch("http://localhost/mi_api/api/productos/productos.php")
         .then(response => response.json())
         .then(data => {
 
@@ -21,15 +70,40 @@
             data.forEach(producto => {
 
                 contenido += `
-                    <hr>
-                    <h3>${producto.nombre}</h3>
-                    <p>Precio: $${producto.precio}</p>
-                    <p>Cantidad: ${producto.cantidad}</p>
+                    <div class="card">
+                        <h3>${producto.nombre}</h3>
+                        <p>Precio: $${producto.precio}</p>
+                        <p>Cantidad: ${producto.cantidad}</p>
+                    </div>
                 `;
 
             });
 
             document.getElementById("productos").innerHTML = contenido;
+
+        });
+
+        // API CLIENTES
+
+        fetch("http://localhost/mi_api/api/clientes/clientes.php")
+        .then(response => response.json())
+        .then(data => {
+
+            let contenido = "";
+
+            data.forEach(cliente => {
+
+                contenido += `
+                    <div class="card">
+                        <h3>${cliente.nombre}</h3>
+                        <p>edad: ${cliente.edad}</p>
+                        <p>Teléfono: ${cliente.telefono}</p>
+                    </div>
+                `;
+
+            });
+
+            document.getElementById("clientes").innerHTML = contenido;
 
         });
 
