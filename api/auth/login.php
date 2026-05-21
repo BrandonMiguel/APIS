@@ -8,6 +8,23 @@ include("../../config/conexion.php");
 
 $datos = json_decode(file_get_contents("php://input"), true);
 
+
+// VALIDAR SI NO LLEGARON DATOS
+
+if(!$datos){
+
+    echo json_encode([
+
+        "estado" => "error",
+        "mensaje" => "No se recibieron datos"
+
+    ]);
+
+    exit();
+
+}
+
+
 $usuario = trim($datos["usuario"]);
 $password = trim($datos["password"]);
 

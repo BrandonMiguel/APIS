@@ -2,9 +2,9 @@
 
 include("config/conexion.php");
 
-$usuario = "john";
+$usuario = "director";
 
-$password = password_hash("12345", PASSWORD_DEFAULT);
+$password = password_hash("321", PASSWORD_DEFAULT);
 
 $sql = $conexion->prepare(
     "INSERT INTO usuarios(usuario, password)
