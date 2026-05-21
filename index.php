@@ -1,3 +1,17 @@
+<?php
+
+session_start();
+
+if(!isset($_SESSION["usuario"])){
+
+    header("Location: login.html");
+
+    exit();
+
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,6 +43,31 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+
+        }
+
+        .topbar{
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+        }
+
+        .usuario{
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .btn-logout{
+
+            background: #dc2626;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
 
         }
 
@@ -98,6 +137,21 @@
 
     <div class="contenedor">
 
+        <div class="topbar">
+
+            <div class="usuario">
+
+                Bienvenido:
+                <?php echo $_SESSION["usuario"]; ?>
+
+            </div>
+
+            <button class="btn-logout" onclick="logout()">
+                Cerrar Sesión
+            </button>
+
+        </div>
+
         <h1>CRUD API Productos</h1>
 
         <input type="hidden" id="id">
@@ -130,7 +184,7 @@ const API = "http://localhost/mi_api/api/productos/productos.php";
 
 
 // =====================================
-// CARGAR
+// CARGAR PRODUCTOS
 // =====================================
 
 function cargarProductos(){
@@ -197,16 +251,48 @@ cargarProductos();
 
 
 // =====================================
+// LIMPIAR FORMULARIO
+// =====================================
+
+function limpiarFormulario(){
+
+    document.getElementById("id").value = "";
+
+    document.getElementById("nombre").value = "";
+
+    document.getElementById("precio").value = "";
+
+    document.getElementById("cantidad").value = "";
+
+}
+
+
+
+// =====================================
 // AGREGAR
 // =====================================
 
 function agregarProducto(){
 
-    const nombre = document.getElementById("nombre").value;
+    const nombre = document.getElementById("nombre").value.trim();
 
-    const precio = document.getElementById("precio").value;
+    const precio = document.getElementById("precio").value.trim();
 
-    const cantidad = document.getElementById("cantidad").value;
+    const cantidad = document.getElementById("cantidad").value.trim();
+
+
+    // VALIDAR VACIOS
+
+    if(nombre == "" || precio == "" || cantidad == ""){
+
+        Swal.fire({
+            icon: "warning",
+            title: "Todos los campos son obligatorios"
+        });
+
+        return;
+    }
+
 
     fetch(API, {
 
@@ -238,6 +324,8 @@ function agregarProducto(){
             });
 
             cargarProductos();
+
+            limpiarFormulario();
 
         }else{
 
@@ -278,6 +366,26 @@ function editarProducto(id, nombre, precio, cantidad){
 
 function actualizarProducto(){
 
+    const id = document.getElementById("id").value;
+
+    const nombre = document.getElementById("nombre").value.trim();
+
+    const precio = document.getElementById("precio").value.trim();
+
+    const cantidad = document.getElementById("cantidad").value.trim();
+
+
+    if(id == ""){
+
+        Swal.fire({
+            icon: "warning",
+            title: "Selecciona un producto para editar"
+        });
+
+        return;
+    }
+
+
     Swal.fire({
 
         title: "¿Actualizar producto?",
@@ -290,14 +398,6 @@ function actualizarProducto(){
     .then((result) => {
 
         if(result.isConfirmed){
-
-            const id = document.getElementById("id").value;
-
-            const nombre = document.getElementById("nombre").value;
-
-            const precio = document.getElementById("precio").value;
-
-            const cantidad = document.getElementById("cantidad").value;
 
             fetch(API, {
 
@@ -328,6 +428,8 @@ function actualizarProducto(){
                 });
 
                 cargarProductos();
+
+                limpiarFormulario();
 
             });
 
@@ -388,6 +490,24 @@ function eliminarProducto(id){
             });
 
         }
+
+    });
+
+}
+
+
+
+// =====================================
+// LOGOUT
+// =====================================
+
+function logout(){
+
+    fetch("http://localhost/mi_api/api/auth/logout.php")
+
+    .then(() => {
+
+        window.location.href = "login.html";
 
     });
 
